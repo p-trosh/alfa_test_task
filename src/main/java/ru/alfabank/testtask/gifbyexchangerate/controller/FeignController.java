@@ -1,6 +1,5 @@
 package ru.alfabank.testtask.gifbyexchangerate.controller;
 
-import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.env.Environment;
 import org.springframework.http.ResponseEntity;
@@ -18,21 +17,24 @@ import java.util.Date;
 import java.util.TimeZone;
 
 @RestController
-@RequestMapping(value = "/gif")
-@RequiredArgsConstructor
+@RequestMapping(value = "/gifs/by-exchange-rate")
 public class FeignController {
 
     @Autowired
     private Environment env;
 
     @Autowired
-    private final GifClient gifClient;
+    private GifClient gifClient;
 
     @Autowired
-    private final ExchangeRateClient rateClient;
+    private ExchangeRateClient rateClient;
+
+    private String exchangeAppId;
+
+    private String base;
 
     @GetMapping
-    public ResponseEntity readAirlineData (@RequestParam("symbols") String symbols) {
+    public ResponseEntity getGifByExchangeRate(@RequestParam("symbols") String symbols) {
         String gifUrl = (String) gifClient.readRandomGifByTag(
                 env.getProperty("app.giphy.id"),
                 isRich(symbols) ? "rich" : "broke"
@@ -40,28 +42,27 @@ public class FeignController {
         return ResponseEntity.ok().body("<iframe src=\"" + gifUrl + "\"></iframe>");
     }
 
-    private boolean isRich(String symbols) {
-        String appId = env.getProperty("app.exchangerates.id");
-        String base = env.getProperty("base.currency");
-
-        TimeZone tz = TimeZone.getTimeZone("UTC");
-        DateFormat df = new SimpleDateFormat("yyyy-MM-dd");
-        df.setTimeZone(tz);
-        String nowAsISO = df.format(new Date());
-
-        BigDecimal todayRate = new BigDecimal(rateClient.readExchangeRateRequestBySymbolsAndDate(
-                appId,
-                nowAsISO,
-                base,
-                symbols
-        ).getRates().get(symbols));
-
-        BigDecimal yesterdayRate = new BigDecimal(rateClient.readExchangeRateRequestBySymbolsAndDate(
-                appId,
-                nowAsISO,
-                base,
-                symbols
-        ).getRates().get(symbols));
+    public boolean isRich(String symbols) {
+        Long millis = System.currentTimeMillis();
+        BigDecimal todayRate = getRate(millis, symbols);
+        BigDecimal yesterdayRate = getRate(millis -  86_400_000L, symbols);
         return todayRate.compareTo(yesterdayRate) != -1;
+    }
+
+    public BigDecimal getRate(Long millis, String symbols) {
+        exchangeAppId = env.getProperty("app.exchangerates.id");
+        base = env.getProperty("base.currency");
+        return new BigDecimal(rateClient.readExchangeRateBySymbolsAndDate(
+                exchangeAppId,
+                getFormatDate(millis),
+                base,
+                symbols
+        ).getRates().get(symbols));
+    }
+
+    public String getFormatDate(Long millis) {
+        DateFormat df = new SimpleDateFormat("yyyy-MM-dd");
+        df.setTimeZone(TimeZone.getTimeZone("UTC"));
+        return df.format(new Date(millis));
     }
 }

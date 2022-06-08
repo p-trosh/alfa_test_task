@@ -5,7 +5,7 @@ import lombok.Data;
 import java.util.Map;
 
 @Data
-public class ExchangeRateRequest {
+public class ExchangeRateResponse {
     private Map<String, String> rates;
 }
 

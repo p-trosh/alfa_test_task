@@ -2,11 +2,16 @@ plugins {
 	id 'org.springframework.boot' version '2.7.0'
 	id 'io.spring.dependency-management' version '1.0.11.RELEASE'
 	id 'java'
+	id 'application'
+}
+
+application {
+	mainClassName = 'ru/alfabank/testtask/gifbyexchangerate/GifByExchangeRateApplication'
 }
 
 group = 'ru.alfabank.testtask'
 version = '0.0.1-SNAPSHOT'
-sourceCompatibility = '8'
+sourceCompatibility = '1.8'
 
 repositories {
 	mavenCentral()
@@ -16,6 +21,7 @@ dependencies {
 	implementation 'org.springframework.boot:spring-boot-starter'
 	implementation 'org.springframework.boot:spring-boot-starter-web'
 	implementation group: 'org.springframework.cloud', name: 'spring-cloud-starter-openfeign', version: '3.1.1'
+    implementation 'junit:junit:4.13.1'
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
 
 	compileOnly 'org.projectlombok:lombok:1.18.24'
@@ -26,6 +32,6 @@ dependencies {
 
 }
 
-tasks.named('test') {
+test {
 	useJUnitPlatform()
 }

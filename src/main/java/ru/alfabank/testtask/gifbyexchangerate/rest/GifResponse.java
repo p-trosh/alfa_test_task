@@ -5,6 +5,6 @@ import lombok.Data;
 import java.util.Map;
 
 @Data
-public class GifRequest {
+public class GifResponse {
     private Map<String, Object> data;
 }

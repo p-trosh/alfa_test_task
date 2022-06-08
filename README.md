@@ -1,2 +1,20 @@
-# alfa_test_task
-Test task for junior java developer in alfabank
+# Тестовое задание на вакансию Junior Java разработчик / Стажер в Альфа-Банк
+Автор - Трошенков Петр  
+Дата - 07.06.2022
+
+## Постановка задачи
+Создать сервис, который обращается к сервису курсов валют, и отображает gif:
+если курс по отношению к USD за сегодня стал выше вчерашнего, то отдаем рандомную отсюда https://giphy.com/search/rich
+если ниже - отсюда https://giphy.com/search/broke
+
+##Запуск программы
+Строка для запуска из консоли: docker run -p 9090:9090 -t wmtrosh/gif-by-exchange-rate
+
+##Использование сервиса
+Сервис отображает gif в зависимости от выбранной валюты.
+
+Базовый путь сервиса http://localhost:9090/gifs/by-exchange-rate
+
+Параметры symbols: строка (обязательно) - код выбранной валюты
+
+Пример запроса http://localhost:9090/gifs/by-exchange-rate?symbols=RUB
